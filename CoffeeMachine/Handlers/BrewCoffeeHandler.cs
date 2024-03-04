@@ -11,20 +11,24 @@ namespace CoffeeMachine.Api.Handlers
     public class BrewCoffeeHandler : IRequestHandler<BrewCoffeeQuery, Result<(int, BrewCoffeeResponse)>>
     {
         private ICoffeeMachineService _coffeeMachineClient;
+        private IWeatherMapService _weatherMapClient;
         private IDateTimeProviderService _dateTimeProviderClient;
         private ILogger<BrewCoffeeHandler> _logger;
 
-        public BrewCoffeeHandler(ICoffeeMachineService coffeeMachineClient,
+        public BrewCoffeeHandler(ICoffeeMachineService coffeeMachineClient, IWeatherMapService weatherMapClient,
             IDateTimeProviderService dateTimeClient, ILogger<BrewCoffeeHandler> logger)
         {
             if (coffeeMachineClient == null)
                 throw new ArgumentNullException("Data Store cannot be null.");
+            if (weatherMapClient == null)
+                throw new ArgumentNullException("Weather Map Client cannot be null.");
             if (dateTimeClient == null)
                 throw new ArgumentNullException("Date Time Client cannot be null.");
             if (logger == null)
                 throw new ArgumentNullException("Logger cannot be null.");
 
             _coffeeMachineClient = coffeeMachineClient;
+            _weatherMapClient = weatherMapClient;
             _dateTimeProviderClient = dateTimeClient;
             _logger = logger;
         }
@@ -52,6 +56,15 @@ namespace CoffeeMachine.Api.Handlers
             // Check for Request Count
             if (machineResult.Value > 0 && machineResult.Value % 5 != 0)
             {
+                var weatherResult = await _weatherMapClient.GetCurrentWeatherAsync("Sydney,AU");
+                if (weatherResult.IsFailed)
+                    return Result.Fail(weatherResult.Errors);
+
+                // Return OK with Refreshing Message if temp is g.t. 25 deg
+                _logger.LogInformation(ResponseMessage.REFRESHING_WEATHER);
+                if (weatherResult.Value.Item2 != null && weatherResult.Value.Item1 == HttpStatusCode.OK && weatherResult.Value.Item2.MainWeatherData.CurrentTemperature > 30.0)
+                    return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTimeOffset.UtcNow)));
+
                 // Return OK without Refreshing Message
                 _logger.LogInformation(ResponseMessage.OK);
                 return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.OK, DateTimeOffset.UtcNow)));
