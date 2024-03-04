@@ -6,7 +6,7 @@ namespace CoffeeMachine.Api.Services.Interfaces
 {
 	public interface IWeatherMapService
 	{
-        public Task<Result<(HttpStatusCode, CurrentWeather)>> GetCurrentWeatherAsync(string location);
+        public Task<Result<CurrentWeather>> GetCurrentWeatherAsync(string location);
 
     }
 }

@@ -26,7 +26,7 @@ namespace CoffeeMachine.Api.Services
             _httpClient.BaseAddress = new Uri($"http://api.openweathermap.org/data/2.5/");
         }
 
-        public async Task<Result<(HttpStatusCode,CurrentWeather)>> GetCurrentWeatherAsync(string location)
+        public async Task<Result<CurrentWeather>> GetCurrentWeatherAsync(string location)
         {
             if (location == null || location == string.Empty)
             {
@@ -53,7 +53,7 @@ namespace CoffeeMachine.Api.Services
                     }
 
                     _logger.LogInformation("Current Weather:", currentWeather);
-                    return Result.Ok((response.StatusCode,currentWeather));
+                    return Result.Ok(currentWeather);
 
                 default:
                     // API Returned Error

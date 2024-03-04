@@ -61,9 +61,12 @@ namespace CoffeeMachine.Api.Handlers
                     return Result.Fail(weatherResult.Errors);
 
                 // Return OK with Refreshing Message if temp is g.t. 25 deg
-                _logger.LogInformation(ResponseMessage.REFRESHING_WEATHER);
-                if (weatherResult.Value.Item2 != null && weatherResult.Value.Item1 == HttpStatusCode.OK && weatherResult.Value.Item2.MainWeatherData.CurrentTemperature > 30.0)
+                if (weatherResult.Value != null
+                    && weatherResult.Value.MainWeatherData.CurrentTemperature > 30.0)
+                {
+                    _logger.LogInformation(ResponseMessage.REFRESHING_WEATHER);
                     return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTimeOffset.UtcNow)));
+                }
 
                 // Return OK without Refreshing Message
                 _logger.LogInformation(ResponseMessage.OK);
