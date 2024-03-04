@@ -56,6 +56,7 @@ namespace CoffeeMachine.Api.Handlers
             // Check for Request Count
             if (machineResult.Value > 0 && machineResult.Value % 5 != 0)
             {
+                // Set default location to Sydney,AU
                 var weatherResult = await _weatherMapClient.GetCurrentWeatherAsync("Sydney,AU");
                 if (weatherResult.IsFailed)
                     return Result.Fail(weatherResult.Errors);
