@@ -1,1 +1,1 @@
-CoffeeMachine machine is a simple .NET Core app that controls an imaginary internet-connected coffee machine. 
+CoffeeMachine app is a simple .NET Core app that controls an imaginary internet-connected coffee machine. 
