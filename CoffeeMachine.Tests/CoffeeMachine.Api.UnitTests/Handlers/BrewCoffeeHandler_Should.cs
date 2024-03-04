@@ -7,6 +7,7 @@ using CoffeeMachine.Api.Dtos.Requests;
 using Microsoft.AspNetCore.Http;
 using CoffeeMachine.Api.Messages;
 using Microsoft.Extensions.Logging;
+using FluentResults;
 
 namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
 {
@@ -74,8 +75,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_OK()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(1);
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(false);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
@@ -92,8 +93,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_503()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(5);
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(false);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(5));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
@@ -109,8 +110,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_418()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(1);
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(true);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(true));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);

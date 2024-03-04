@@ -9,6 +9,7 @@ using CoffeeMachine.Api.Dtos.Responses;
 using CoffeeMachine.Api.Messages;
 using Microsoft.AspNetCore.Mvc;
 using CoffeeMachine.Tests.Api.UnitTests.TestHelpers;
+using FluentResults;
 
 namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
 {
@@ -65,7 +66,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
             // Arrange
             var okResponse = new BrewCoffeeResponse(ResponseMessage.OK, DateTimeOffset.UtcNow);
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(),CancellationToken.None))
-                .ReturnsAsync((StatusCodes.Status200OK, okResponse));
+                .ReturnsAsync(Result.Ok((StatusCodes.Status200OK, okResponse)));
 
             // Act
             var actionResult = await sut.BrewCoffee();
@@ -86,7 +87,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
             // Arrange
             var okResponse = new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTimeOffset.UtcNow);
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
-                .ReturnsAsync((StatusCodes.Status200OK, okResponse));
+                .ReturnsAsync(Result.Ok((StatusCodes.Status200OK, okResponse)));
 
             // Act
             var actionResult = await sut.BrewCoffee();
@@ -107,7 +108,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
             // Arrange
             var badResponse = new BrewCoffeeResponse();
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
-                .ReturnsAsync((StatusCodes.Status503ServiceUnavailable, badResponse));
+                .ReturnsAsync(Result.Ok((StatusCodes.Status503ServiceUnavailable, badResponse)));
 
             // Act
             var actionResult = await sut.BrewCoffee();
@@ -126,7 +127,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
             // Arrange
             var badResponse = new BrewCoffeeResponse();
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
-                .ReturnsAsync((StatusCodes.Status418ImATeapot, badResponse));
+                .ReturnsAsync(Result.Ok((StatusCodes.Status418ImATeapot, badResponse)));
 
             // Act
             var actionResult = await sut.BrewCoffee();
