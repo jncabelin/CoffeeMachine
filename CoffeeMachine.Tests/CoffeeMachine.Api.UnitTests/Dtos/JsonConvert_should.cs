@@ -9,8 +9,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Dtos
     public class JsonConvert_should
     {
         [Fact]
-        [DisplayName("Serialize and Deserialize Clouds")]
-        public void Serialize_and_Deserialize_Clouds()
+        [DisplayName("Serialize and Deserialize BrewCoffeeResponse")]
+        public void Serialize_and_Deserialize_BrewCoffeeResponse()
         {
             // Arrange
             var response = new BrewCoffeeResponse(statusMessage: ResponseMessage.OK, DateTimeOffset.UtcNow);
