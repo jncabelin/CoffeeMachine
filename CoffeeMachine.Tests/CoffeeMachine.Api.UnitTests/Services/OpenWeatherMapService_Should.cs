@@ -56,11 +56,11 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Services
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.NotNull(result.Value.Item2);
-            Assert.NotNull(result.Value.Item2.MainWeatherData);
-            Assert.IsType<CurrentWeather>(result.Value.Item2);
-            Assert.IsType<MainWeatherData>(result.Value.Item2.MainWeatherData);
-            Assert.IsType<Double>(result.Value.Item2.MainWeatherData.CurrentTemperature);
+            Assert.NotNull(result.Value);
+            Assert.NotNull(result.Value.MainWeatherData);
+            Assert.IsType<CurrentWeather>(result.Value);
+            Assert.IsType<MainWeatherData>(result.Value.MainWeatherData);
+            Assert.IsType<Double>(result.Value.MainWeatherData.CurrentTemperature);
         }
 
         [Fact]

@@ -8,6 +8,7 @@ using CoffeeMachine.Api.Dtos.Requests;
 using Microsoft.AspNetCore.Http;
 using CoffeeMachine.Api.Messages;
 using Microsoft.Extensions.Logging;
+using FluentResults;
 
 namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
 {
@@ -88,9 +89,9 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_OK()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(1);
-            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync((HttpStatusCode.OK, OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(false);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
@@ -108,9 +109,9 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_200_And_Refreshing_Message()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(1);
-            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync((HttpStatusCode.OK, OpenWeatherMap_TestObjects.TestObjects_HotCurrentWeather));
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(false);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_HotCurrentWeather));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
@@ -127,9 +128,9 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_503()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(5);
-            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync((HttpStatusCode.OK, OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(false);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(5));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
@@ -145,9 +146,9 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_418()
         {
             // Arrange
-            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(1);
-            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync((HttpStatusCode.OK, OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
-            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(true);
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(true));
 
             // Act
             var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
