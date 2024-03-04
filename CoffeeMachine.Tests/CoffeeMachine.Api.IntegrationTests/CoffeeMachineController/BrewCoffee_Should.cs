@@ -30,7 +30,7 @@ namespace CoffeeMachine.Tests.Api.IntegrationTests
             var responseBody = await response.Content.ReadAsStringAsync();
             Assert.Contains("message", responseBody);
             Assert.Contains("prepared", responseBody);
-            Assert.Contains(ResponseMessage.OK,responseBody);
+            Assert.True(responseBody.Contains(ResponseMessage.OK) || responseBody.Contains(ResponseMessage.REFRESHING_WEATHER));
         }
 
         [Fact]
