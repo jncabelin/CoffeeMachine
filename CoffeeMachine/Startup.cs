@@ -19,6 +19,7 @@ namespace CoffeeMachine.Api
         {
             services.AddControllers();
             services.AddSingleton<ICoffeeMachineService, FakeCoffeeMachineService>();
+            services.AddSingleton<IWeatherMapService, OpenWeatherMapService>();
             services.AddSingleton<IDateTimeProviderService, DateTimeProviderService>();
             services.AddMediatR(configuration => configuration.RegisterServicesFromAssemblyContaining(typeof(BrewCoffeeQuery)));
             services.AddSwaggerGen(c =>
