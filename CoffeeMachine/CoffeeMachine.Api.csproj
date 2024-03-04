@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="FluentResults" Version="3.15.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Validators\" />
+    <None Remove="Dtos\" />
+    <None Remove="Handlers\" />
+    <None Remove="Messages\" />
+    <None Remove="Models\" />
+    <None Remove="Models\CoffeeMachine\" />
+    <None Remove="Services\" />
+    <None Remove="Dtos\Requests\" />
+    <None Remove="Dtos\Responses\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Validators\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Handlers\" />
+    <Folder Include="Messages\" />
+    <Folder Include="Models\" />
+    <Folder Include="Models\CoffeeMachine\" />
+    <Folder Include="Services\" />
+    <Folder Include="Dtos\Requests\" />
+    <Folder Include="Dtos\Responses\" />
+  </ItemGroup>
+</Project>

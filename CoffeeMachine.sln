@@ -5,7 +5,7 @@ VisualStudioVersion = 25.0.1706.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoffeeMachine.Api", "CoffeeMachine\CoffeeMachine.Api.csproj", "{F1FCF70B-3913-4763-8D82-46A33BA489C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoffeeMachine.Tests", "CoffeeMachineSystem.Tests\CoffeeMachine.Tests.csproj", "{5AA1D082-1D65-4215-B1DF-DBC2F54026EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoffeeMachine.Tests", "CoffeeMachine.Tests\CoffeeMachine.Tests.csproj", "{5AA1D082-1D65-4215-B1DF-DBC2F54026EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
