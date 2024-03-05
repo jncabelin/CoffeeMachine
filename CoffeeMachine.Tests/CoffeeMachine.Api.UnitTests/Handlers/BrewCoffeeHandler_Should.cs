@@ -89,6 +89,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_OK()
         {
             // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
             _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
@@ -100,7 +102,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             Assert.True(result.IsSuccess);
             Assert.Equal(StatusCodes.Status200OK, result.Value.Item1);
             Assert.Equal(ResponseMessage.OK, result.Value.Item2.Message);
-            Assert.Equal(DateTime.UtcNow.Date, result.Value.Item2.Prepared.Date);
+            Assert.Equal(now, result.Value.Item2.Prepared);
         }
 
 
@@ -128,6 +130,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_503()
         {
             // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(5));
             _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
@@ -146,6 +150,8 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public async void Return_418()
         {
             // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
             _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(true));
@@ -157,6 +163,56 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             Assert.True(result.IsSuccess);
             Assert.Equal(StatusCodes.Status418ImATeapot, result.Value.Item1);
             Assert.Null(result.Value.Item2.Message);
+        }
+
+        [Fact]
+        [DisplayName("Fail if CoffeeMachine Fails")]
+        public async void Fail_if_CoffeeMachine_Fails()
+        {
+            // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Fail("Error"));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
+
+            // Act
+            var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailed);
+        }
+
+        [Fact]
+        [DisplayName("Fail if IsApril1st Fails")]
+        public async void Fail_if_IsApril1st_Fails()
+        {
+            // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Fail("Error"));
+
+            // Act
+            var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailed);
+        }
+
+        [Fact]
+        [DisplayName("Fail if GetISO8601 Fails")]
+        public async void Fail_if_GetISO8601_Fails()
+        {
+            // Arrange
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Fail("Error"));
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
+
+            // Act
+            var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailed);
         }
     }
 }

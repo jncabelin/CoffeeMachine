@@ -13,7 +13,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Dtos
         public void Serialize_and_Deserialize_BrewCoffeeResponse()
         {
             // Arrange
-            var response = new BrewCoffeeResponse(statusMessage: ResponseMessage.OK, DateTimeOffset.UtcNow);
+            var response = new BrewCoffeeResponse(ResponseMessage.OK, DateTimeOffset.UtcNow.ToString());
 
             // Act
             var jsonResult = JsonConvert.SerializeObject(response);

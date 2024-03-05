@@ -6,7 +6,6 @@ namespace CoffeeMachine.Api.Services
     public class DateTimeProviderService : IDateTimeProviderService
     {
         private ILogger<DateTimeProviderService> _logger;
-        private DateTime Now { get; } = DateTime.UtcNow;
 
         public DateTimeProviderService (ILogger<DateTimeProviderService> logger)
         {
@@ -18,8 +17,14 @@ namespace CoffeeMachine.Api.Services
         // Compare timeNow if April 1st
         public Result<bool> IsAprilFirst()
         {
-            _logger.LogInformation($"The Date today is {Now}");
+            var Now = DateTime.Now;
             return Result.Ok(Now.Day == 1 && Now.Month == 4);
+        }
+
+        // Get ISO-8601 Standard string
+        public Result<string> GetISO8601Now()
+        {
+            return Result.Ok(DateTime.Now.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
         }
     }
 }
