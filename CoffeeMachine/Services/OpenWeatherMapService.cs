@@ -21,6 +21,9 @@ namespace CoffeeMachine.Api.Services
                 throw new ArgumentNullException("Logger cannot be null.");
 
             _apiKey = configuration.GetSection("WeatherAPI:APIkey").Value;
+            if (_apiKey == null || _apiKey == String.Empty)
+                throw new KeyNotFoundException("API Key is invalid.");
+
             _logger = logger;
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri($"http://api.openweathermap.org/data/2.5/");

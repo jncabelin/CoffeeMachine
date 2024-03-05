@@ -45,6 +45,21 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Services
         }
 
         [Fact]
+        [DisplayName("Throw Exception if invalid APIKey")]
+        public void Throw_Exception_if_Invalid_APIKey()
+        {
+            // Arrange
+            Mock<IConfigurationSection> mockSection = new Mock<IConfigurationSection>();
+            mockSection.Setup(x => x.Value).Returns("");
+            _config.Setup(c => c.GetSection(It.IsAny<string>())).Returns(mockSection.Object);
+
+            Action testConstructor = () => new OpenWeatherMapService(_config.Object, _logger.Object);
+
+            // Act and Assert
+            Assert.Throws<KeyNotFoundException>(testConstructor);
+        }
+
+        [Fact]
         [DisplayName("Get CurrentWeather")]
         public async void Get_CurrentWeather()
         {
