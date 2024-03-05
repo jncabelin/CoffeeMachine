@@ -8,13 +8,13 @@ namespace CoffeeMachine.Api.Dtos.Responses
         public string Message { get; set; }
 
         [JsonProperty("prepared")]
-        public DateTimeOffset Prepared { get; set; }
+        public string Prepared { get; set; }
 
 		public BrewCoffeeResponse()
 		{
 		}
 
-		public BrewCoffeeResponse(string statusMessage, DateTimeOffset time)
+		public BrewCoffeeResponse(string statusMessage, string time)
 		{
 			this.Message = statusMessage;
 			this.Prepared = time;

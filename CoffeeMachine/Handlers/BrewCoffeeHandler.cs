@@ -49,12 +49,16 @@ namespace CoffeeMachine.Api.Handlers
                 return Result.Ok((StatusCodes.Status418ImATeapot, new BrewCoffeeResponse()));
             }
 
+            var dateTimeNowResult = _dateTimeProviderClient.GetISO8601Now();
+            if (dateTimeNowResult.IsFailed)
+                return Result.Fail("Cannot retrieve ISO8601 timestamp.");
+
             // Check for Request Count
             if (machineResult.Value > 0 && machineResult.Value % 5 != 0)
             {
                 // Return OK without Refreshing Message
                 _logger.LogInformation(ResponseMessage.OK);
-                return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.OK, DateTimeOffset.UtcNow)));
+                return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.OK, dateTimeNowResult.Value)));
             }
 
             // Return 503 every 5th request
