@@ -20,6 +20,7 @@
     <None Remove="Messages\" />
     <None Remove="Models\" />
     <None Remove="Models\CoffeeMachine\" />
+    <None Remove="Models\OpenWeatherMap\" />
     <None Remove="Services\" />
     <None Remove="Dtos\Requests\" />
     <None Remove="Dtos\Responses\" />
@@ -31,6 +32,7 @@
     <Folder Include="Messages\" />
     <Folder Include="Models\" />
     <Folder Include="Models\CoffeeMachine\" />
+    <Folder Include="Models\OpenWeatherMap\" />
     <Folder Include="Services\" />
     <Folder Include="Dtos\Requests\" />
     <Folder Include="Dtos\Responses\" />

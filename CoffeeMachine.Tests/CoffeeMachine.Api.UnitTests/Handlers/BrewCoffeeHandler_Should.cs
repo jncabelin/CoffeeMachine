@@ -2,7 +2,7 @@
 using CoffeeMachine.Api.Handlers;
 using CoffeeMachine.Api.Services.Interfaces;
 using Moq;
-using System.Net;
+using CoffeeMachine.Tests.Api.UnitTests.TestData;
 using CoffeeMachine.Api.Dtos.Requests;
 using Microsoft.AspNetCore.Http;
 using CoffeeMachine.Api.Messages;
@@ -11,8 +11,9 @@ using FluentResults;
 
 namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
 {
-	public class BrewCoffeeHandler_Should
-	{
+    public class BrewCoffeeHandler_Should
+    {
+        Mock<IWeatherMapService> _weatherClient;
         Mock<ICoffeeMachineService> _coffeeMachineClient;
         Mock<IDateTimeProviderService> _dataTimeClient;
         Mock<ILogger<BrewCoffeeHandler>> _logger;
@@ -20,10 +21,11 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
 
         public BrewCoffeeHandler_Should()
         {
+            _weatherClient = new Mock<IWeatherMapService>();
             _coffeeMachineClient = new Mock<ICoffeeMachineService>();
             _dataTimeClient = new Mock<IDateTimeProviderService>();
             _logger = new Mock<ILogger<BrewCoffeeHandler>>();
-            _handler = new BrewCoffeeHandler(_coffeeMachineClient.Object, _dataTimeClient.Object, _logger.Object);
+            _handler = new BrewCoffeeHandler(_coffeeMachineClient.Object, _weatherClient.Object, _dataTimeClient.Object, _logger.Object);
         }
 
         [Fact]
@@ -31,7 +33,18 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public void Throw_Exception_if_Null_ICoffeeMachineService()
         {
             // Arrange
-            Action testConstructor = () => new BrewCoffeeHandler(null, _dataTimeClient.Object, _logger.Object);
+            Action testConstructor = () => new BrewCoffeeHandler(null, _weatherClient.Object, _dataTimeClient.Object, _logger.Object);
+
+            // Act and Assert
+            Assert.Throws<ArgumentNullException>(testConstructor);
+        }
+
+        [Fact]
+        [DisplayName("Throw Exception if Null IWeatherService")]
+        public void Throw_Exception_if_Null_IWeatherService()
+        {
+            // Arrange
+            Action testConstructor = () => new BrewCoffeeHandler(_coffeeMachineClient.Object, null, _dataTimeClient.Object, _logger.Object);
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(testConstructor);
@@ -42,7 +55,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public void Throw_Exception_if_Null_IDateTimeService()
         {
             // Arrange
-            Action testConstructor = () => new BrewCoffeeHandler(_coffeeMachineClient.Object, null, _logger.Object);
+            Action testConstructor = () => new BrewCoffeeHandler(_coffeeMachineClient.Object, _weatherClient.Object, null, _logger.Object);
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(testConstructor);
@@ -53,7 +66,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public void Throw_Exception_if_Null_ILogger()
         {
             // Arrange
-            Action testConstructor = () => new BrewCoffeeHandler(_coffeeMachineClient.Object, _dataTimeClient.Object, null);
+            Action testConstructor = () => new BrewCoffeeHandler(_coffeeMachineClient.Object, _weatherClient.Object, _dataTimeClient.Object, null);
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(testConstructor);
@@ -64,7 +77,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         public void Be_Created_if_Valid_Parameters()
         {
             // Act
-            var sut = new BrewCoffeeHandler(_coffeeMachineClient.Object, _dataTimeClient.Object, _logger.Object);
+            var sut = new BrewCoffeeHandler(_coffeeMachineClient.Object, _weatherClient.Object, _dataTimeClient.Object, _logger.Object);
 
             // Assert
             Assert.NotNull(sut);
@@ -78,6 +91,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
             _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
@@ -91,6 +105,27 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         }
 
         [Fact]
+        [DisplayName("Return 200 and Refreshing Message")]
+        public async void Return_200_And_Refreshing_Message()
+        {
+            // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_HotCurrentWeather));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
+
+            // Act
+            var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal(StatusCodes.Status200OK, result.Value.Item1);
+            Assert.Equal(ResponseMessage.REFRESHING_WEATHER, result.Value.Item2.Message);
+            Assert.Equal(now, result.Value.Item2.Prepared);
+        }
+
+        [Fact]
         [DisplayName("Return 503")]
         public async void Return_503()
         {
@@ -98,6 +133,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
             _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(5));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
 
             // Act
@@ -117,6 +153,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
             _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
             _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Ok(OpenWeatherMap_TestObjects.TestObjects_CurrentWeather));
             _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(true));
 
             // Act
@@ -177,6 +214,23 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
             // Assert
             Assert.True(result.IsFailed);
         }
+
+        [Fact]
+        [DisplayName("Fail if GetCurrentWeather Fails")]
+        public async void Fail_if_GetCurrentWeather_Fails()
+        {
+            // Arrange
+            var now = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            _dataTimeClient.Setup(c => c.GetISO8601Now()).Returns(Result.Ok(now));
+            _coffeeMachineClient.Setup(c => c.BrewProduct(It.IsAny<int>())).ReturnsAsync(Result.Ok(1));
+            _weatherClient.Setup(c => c.GetCurrentWeatherAsync(It.IsAny<string>())).ReturnsAsync(Result.Fail("Error"));
+            _dataTimeClient.Setup(c => c.IsAprilFirst()).Returns(Result.Ok(false));
+
+            // Act
+            var result = await _handler.Handle(new BrewCoffeeQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailed);
+        }
     }
 }
-
