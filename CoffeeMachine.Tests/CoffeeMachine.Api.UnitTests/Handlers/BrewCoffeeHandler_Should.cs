@@ -3,7 +3,6 @@ using CoffeeMachine.Api.Handlers;
 using CoffeeMachine.Api.Services.Interfaces;
 using Moq;
 using CoffeeMachine.Tests.Api.UnitTests.TestData;
-using System.Net;
 using CoffeeMachine.Api.Dtos.Requests;
 using Microsoft.AspNetCore.Http;
 using CoffeeMachine.Api.Messages;
@@ -12,8 +11,8 @@ using FluentResults;
 
 namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
 {
-	public class BrewCoffeeHandler_Should
-	{
+    public class BrewCoffeeHandler_Should
+    {
         Mock<IWeatherMapService> _weatherClient;
         Mock<ICoffeeMachineService> _coffeeMachineClient;
         Mock<IDateTimeProviderService> _dataTimeClient;
@@ -235,4 +234,3 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Handlers
         }
     }
 }
-

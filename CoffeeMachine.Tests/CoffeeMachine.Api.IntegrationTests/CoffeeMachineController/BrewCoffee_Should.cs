@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Data;
 using System.Net;
 using CoffeeMachine.Api;
 using CoffeeMachine.Api.Messages;
