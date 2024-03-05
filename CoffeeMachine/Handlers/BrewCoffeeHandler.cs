@@ -70,7 +70,7 @@ namespace CoffeeMachine.Api.Handlers
                     && weatherResult.Value.MainWeatherData.CurrentTemperature > 30.0)
                 {
                     _logger.LogInformation(ResponseMessage.REFRESHING_WEATHER);
-                    return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTimeOffset.UtcNow)));
+                    return Result.Ok((StatusCodes.Status200OK, new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, dateTimeNowResult.Value)));
                 }
 
                 // Return OK without Refreshing Message
