@@ -64,7 +64,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
 		public async Task Return_200_using_BrewCoffee()
 		{
             // Arrange
-            var okResponse = new BrewCoffeeResponse(ResponseMessage.OK, DateTimeOffset.UtcNow);
+            var okResponse = new BrewCoffeeResponse(ResponseMessage.OK, DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(),CancellationToken.None))
                 .ReturnsAsync(Result.Ok((StatusCodes.Status200OK, okResponse)));
 
@@ -85,7 +85,7 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
         public async Task Return_200_Refreshing_using_BrewCoffee()
         {
             // Arrange
-            var okResponse = new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTimeOffset.UtcNow);
+            var okResponse = new BrewCoffeeResponse(ResponseMessage.REFRESHING_WEATHER, DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
             _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
                 .ReturnsAsync(Result.Ok((StatusCodes.Status200OK, okResponse)));
 
@@ -137,6 +137,26 @@ namespace CoffeeMachine.Tests.Api.UnitTests.Controllers
             Assert.NotNull(objResult);
             Assert.NotNull(objResult?.Value);
             Assert.Equal(StatusCodes.Status418ImATeapot, objResult?.StatusCode);
+            Assert.True(HelperMethods.Compare(objResult, new Object()));
+        }
+
+        [Fact]
+        [DisplayName("Return 500 if BrewCoffeeQuery fails")]
+        public async Task Return_500_if_BrewCoffeeQuery_fails()
+        {
+            // Arrange
+            var badResponse = new BrewCoffeeResponse();
+            _mediator.Setup(m => m.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
+                .ReturnsAsync(Result.Fail("Error"));
+
+            // Act
+            var actionResult = await sut.BrewCoffee();
+            var objResult = actionResult as JsonResult;
+
+            // Assert
+            Assert.NotNull(objResult);
+            Assert.NotNull(objResult?.Value);
+            Assert.Equal(StatusCodes.Status500InternalServerError, objResult?.StatusCode);
             Assert.True(HelperMethods.Compare(objResult, new Object()));
         }
     }
