@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Data;
 using System.Net;
 using CoffeeMachine.Api;
 using CoffeeMachine.Api.Messages;
@@ -20,17 +21,27 @@ namespace CoffeeMachine.Tests.Api.IntegrationTests
 		public async Task UseCase001_ReturnStatusOK()
 		{
             // Arrange
+            var DateNow = DateTime.Now;
             var client = _factory.CreateClient();
 
             // Act
             var response = await client.GetAsync("/brew-coffee");
 
             // Assert
-			Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var responseBody = await response.Content.ReadAsStringAsync();
-            Assert.Contains("message", responseBody);
-            Assert.Contains("prepared", responseBody);
-            Assert.True(responseBody.Contains(ResponseMessage.OK) || responseBody.Contains(ResponseMessage.REFRESHING_WEATHER));
+            Assert.NotNull(response);
+            if (DateNow.Day == 1 && DateNow.Month == 4)
+            {
+                Assert.Equal((HttpStatusCode)418, response.StatusCode);
+                Assert.Equal("{}", await response.Content.ReadAsStringAsync());
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Assert.Contains("message", responseBody);
+                Assert.Contains("prepared", responseBody);
+                Assert.True(responseBody.Contains(ResponseMessage.OK) || responseBody.Contains(ResponseMessage.REFRESHING_WEATHER));
+            }
         }
 
         [Fact]
@@ -38,6 +49,7 @@ namespace CoffeeMachine.Tests.Api.IntegrationTests
         public async Task UseCase002_ReturnStatus503()
         {
             // Arrange
+            var DateNow = DateTime.Now;
             var client = _factory.CreateClient();
             HttpResponseMessage response = new HttpResponseMessage();
 
@@ -46,30 +58,16 @@ namespace CoffeeMachine.Tests.Api.IntegrationTests
                 response = await client.GetAsync("/brew-coffee");
 
             // Assert
-            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-            Assert.Equal("{}", await response.Content.ReadAsStringAsync());
-        }
-
-        [Fact]
-        [DisplayName("UseCase003_ReturnStatus418")]
-        public async Task UseCase003_ReturnStatus418()
-        {
-            // Arrange
-            var client = _factory.CreateClient();
-            var DateNow = DateTime.UtcNow;
-
-            // Act
-            var response = await client.GetAsync("/brew-coffee");
-
-            // Assert
+            Assert.NotNull(response);
             if (DateNow.Day == 1 && DateNow.Month == 4)
             {
                 Assert.Equal((HttpStatusCode)418, response.StatusCode);
-                Assert.Contains("I'm a teapot", response.ReasonPhrase);
+                Assert.Equal("{}", await response.Content.ReadAsStringAsync());
             }
             else
             {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+                Assert.Equal("{}", await response.Content.ReadAsStringAsync());
             }
         }
     }
